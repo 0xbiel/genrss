@@ -1,0 +1,81 @@
+#!/bin/bash
+
+header () {
+  echo """<?xml version='1.0' encoding='UTF-8' ?>
+  <rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
+  <channel>
+  <title>$title</title>
+  <link>$link</link>
+  <description>$description</description>
+  <atom:link href='$rsslink' rel='self' type='application/rss+xml' />
+  """ >> ./headerfile
+}
+
+footer () {
+  echo """
+  </channel>
+  </rss>
+  """ >> ./footerfile
+}
+
+item () {
+  echo """<item>
+  <title>$fullTitle</title>
+  <link>$linkadd</link>
+  <guid>$guid</guid>
+  <description>$extract</description>
+  </item>
+  """ >> ./itemsfile
+}
+
+append () {
+  header
+  footer
+  cat ./headerfile ./itemsfile > ./bodyfile
+  cat ./bodyfile ./footerfile > $feedname
+  rm ./headerfile ./itemsfile ./bodyfile ./footerfile
+}
+
+makeConfig () {
+  read -p "Website Name: " title
+  read -p "Website Link: " link
+  read -p "Website Description: " description
+  read -p "URL to store RSS: (e.g 0xbiel.now.sh/rss.xml) " rsslink
+  read -p "Directory to store the RSS: (e.g ./rss.xml) " feedname
+  read -p "Posts Directory " postDir
+  echo -e "title=$title\nlink=$link\ndescription='$description'\nrsslink=$rsslink\nfeedname=$feedname\npostDir=$postDir" > ./config
+  exit
+}
+        
+if [[ ! -f ./config ]]; then
+  makeConfig
+fi
+
+source ./config
+
+if [[ ! -f $feedname ]]; then
+  touch $feedname
+fi
+
+
+if [[ -f $feedname ]]; then
+  rm $feedname
+fi
+touch $feedname
+postArray=( $(ls -t "$postDir"/*.html) )
+numPosts=$(ls "$postDir"/*.html | wc -l)
+echo "numposts is $numPosts"
+postNum=0
+guidadd=$linkadd
+for posts in "${postArray[@]}"; do
+  let postNum+=1
+  post=$posts
+  echo "adding post $postNum/$numPosts"
+  fullTitle=$(grep -o '>.*</b>' $post | sed 's/\(>\|<\/b>\)//g')
+  postname=${post##*/}
+  linkadd="$website"/"$postname"
+  extract=$(tr "\n" "|" < $post | grep -o '<pre>.*</pre>' | sed 's/\(<pre>\|<\/pre>\)//g;s/|/\n/g')
+  item $post
+done
+append
+exit
