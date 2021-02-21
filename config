@@ -1,0 +1,6 @@
+title=example
+link=example.com
+description='Example.'
+rsslink=example.com/rss.xml
+feedname=./rss.xml
+postDir=posts

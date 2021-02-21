@@ -1,6 +1,6 @@
 # genrss.sh
 
-RSS Feed generator written in POSIX Shell
+RSS Feed generator written in Bash.
 
 ![](demo.png)
 

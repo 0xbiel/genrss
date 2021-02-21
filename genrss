@@ -1,31 +1,31 @@
 #!/bin/bash
 
 header () {
-  echo """<?xml version='1.0' encoding='UTF-8' ?>
+  echo "<?xml version='1.0' encoding='UTF-8' ?>
   <rss version='2.0' xmlns:atom='http://www.w3.org/2005/Atom'>
   <channel>
   <title>$title</title>
   <link>$link</link>
   <description>$description</description>
   <atom:link href='$rsslink' rel='self' type='application/rss+xml' />
-  """ >> ./headerfile
+  " >> ./headerfile
 }
 
 footer () {
-  echo """
+  echo "
   </channel>
   </rss>
-  """ >> ./footerfile
+  " >> ./footerfile
 }
 
 item () {
-  echo """<item>
+  echo "<item>
   <title>$fullTitle</title>
   <link>$linkadd</link>
   <guid>$guid</guid>
   <description>$extract</description>
   </item>
-  """ >> ./itemsfile
+  " >> ./itemsfile
 }
 
 append () {
@@ -36,19 +36,9 @@ append () {
   rm ./headerfile ./itemsfile ./bodyfile ./footerfile
 }
 
-makeConfig () {
-  read -p "Website Name: " title
-  read -p "Website Link: " link
-  read -p "Website Description: " description
-  read -p "URL to store RSS: (e.g 0xbiel.now.sh/rss.xml) " rsslink
-  read -p "Directory to store the RSS: (e.g ./rss.xml) " feedname
-  read -p "Posts Directory " postDir
-  echo -e "title=$title\nlink=$link\ndescription='$description'\nrsslink=$rsslink\nfeedname=$feedname\npostDir=$postDir" > ./config
-  exit
-}
-        
 if [[ ! -f ./config ]]; then
-  makeConfig
+  echo "Please, make a config file."
+  exit 0
 fi
 
 source ./config
