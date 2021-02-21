@@ -1,4 +1,4 @@
-# genrss.sh
+# genrss
 
 RSS Feed generator written in Bash.
 
